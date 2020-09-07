@@ -65,7 +65,7 @@ def rename_literals(filename, from_list, to_list):
         change_map[lit]
         assert(1 == 2) # should not get here
       except KeyError:
-        change_map[lit] = avail_to_list[avail_to_index]
+        change_map[lit] = lit + max(to_list)
         avail_to_index += 1
     sub_literals(cnf, cnf_new, change_map)
   shutil.move(new_filename, filename)
