@@ -640,7 +640,10 @@ def decide_info_flow(unwind_limit=32, int_sz=-1, cbmc_timeout=None, modelcounter
       # if use_havoc:
         # args.append("--havoc")
       args.extend(["--outfile", tmp_cnf_filename])
-      args.extend(["--unwind", "32"])
+      if os.getenv("PARTIAL_LOOPS", "false") is not "false":
+        args.extend(["--partial-loops"])
+      if os.getenv("NO_UNWIND", "false") is "false":
+        args.extend(["--unwind", os.getenv("UNWIND", "32")])
       print("We're about to try running cbmc for function " + str(fn) + " with the following args:")
       print(args)
       try:
@@ -808,7 +811,7 @@ def show_func_decls():
 
   # now call the CBMC procedure, getting the number of solutions (2^(info_flow)) and get the corresp.
   # learned clauses
-  decide_info_flow(cbmc_timeout=1000, modelcounter_timeout=1000)
+  decide_info_flow(unwind_limit=int(os.getenv("UNWIND", "32")), cbmc_timeout=1000, modelcounter_timeout=1000)
 
 
   # finally, print out results
@@ -899,7 +902,9 @@ def main(argv):
     except ValueError as e:
       if e.message == both_modes_err_string:
         raise e
-  
+
+  options.unwind = os.getenv("UNWIND", "32")
+
   filename = argv[1]
   extra_include_dir = os.path.split(filename)[0] + "/include"
   assert(len(pycparser.__path__) == 1)
