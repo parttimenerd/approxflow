@@ -331,7 +331,7 @@ def get_preprocessor_lines(fn):
     if e.errno == errno.ENOENT:
       p = subprocess.Popen(["util/coan", "directives", fn], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
-      raise e
+      raise RuntimeError("Coan is not installed, install it from https://sourceforge.net/projects/coan2/files/v6.0.1/")
   out, err = p.communicate()
   return out
 
@@ -931,6 +931,8 @@ def main(argv):
   old_filename = filename
   if not options.model_count_only:
     new_filename = tmpdir + "/" + os.path.basename(filename)
+    shutil.rmtree(tmpdir, ignore_errors=True)
+    os.mkdir(tmpdir)
     insert_assertions(ast, new_filename)
     ast = parse_file_build_if_needed(new_filename, use_cpp=True, cpp_args=include_dirs_strs)
 
