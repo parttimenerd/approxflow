@@ -23,35 +23,37 @@ def sub_literals(cnf, cnf_new, change_map):
       except ValueError:
         if is_comment:
           lits.append(lit)
-    print >> cnf_new, " ".join(lits)
+    with open(cnf_new.name, "a") as f:
+      print(" ".join(lits), file=f)
     #print
 
 
 def rename_literals(filename, from_list, to_list):
   #print from_list, to_list
   if len(to_list) < len(from_list):
-    print "Error: from list length doesn't match to list length, not performing renaming"
+    print("Error: from list length doesn't match to list length, not performing renaming")
     return
   from_list_without_dups_sorted = list(set([e for e in from_list]))
   from_list_without_dups_sorted.sort()
   from_list_sorted = [e for e in from_list]
   from_list_sorted.sort()
   if from_list_without_dups_sorted != from_list_sorted:
-    print "Error: from_list -> to_list must be a function (each from_list entry must be unique), not performing renaming"
+    print("Error: from_list -> to_list must be a function (each from_list entry must be unique), not performing renaming")
     return
   temp_fn = None
   new_filename = None
   with open(filename, 'r') as cnf, tempfile.NamedTemporaryFile(delete=False) as cnf_new:
     new_filename = cnf_new.name
-    
+
     problem_line = cnf.readline()
-    print >> cnf_new, problem_line.rstrip()
+    with open(cnf_new.name, "a") as f:
+      print(problem_line.rstrip(), file=f)
     problem = [tok for tok in problem_line.strip().split()]
     #problem = [tok for tok in problem_line.strip().split(" ") if tok.strip() != ""]
     assert(problem[0] == "p")
     assert(problem[1] == "cnf")
     num_vars = int(problem[2])
- 
+
     change_map = dict()
     change_map[0] = 0 # to avoid having to deal with the 0 entries (end of clause) as special cases
 
@@ -183,15 +185,15 @@ def execute_module(args):
     s = "range " + str(seq[0]) + ":" + str(seq[1])
     if (abs(seq[2]) != 1):
       s = s + ":" + str(seq[2])
-    print s
+    print(s)
     #s = "range " + str(seq[0]) + " " + str(seq[1])
     #if abs(seq[2]) != 1:
     #  s = s + " " + str(seq[2])
     #print s
     #print "range", min(to_lits), max(to_lits)
   else:
-    print "list", " ".join([str(lit) for lit in to_lits]) 
+    print("list", " ".join([str(lit) for lit in to_lits]))
 
-# if run as standalone script
+  # if run as standalone script
 if __name__ == "__main__":
   execute_module(get_argparser().parse_args())
